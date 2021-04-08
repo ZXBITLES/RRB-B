@@ -1,0 +1,1063 @@
+﻿#include "Losung.zxbas"
+
+
+dim keyLeft as uinteger
+dim keyRight as uinteger
+dim keyUp as uinteger
+dim keyDown as uinteger
+dim keyFire as uinteger
+dim map(20,31) as ubyte
+dim termcoord(3,1) as ubyte
+dim termscript(3,14) as ubyte
+
+dim achSFS as ubyte = 0 ' Achievement Strike From Sky
+dim achFB as ubyte = 0 ' Achievement First Blood
+dim achKHU as ubyte = 0 ' Achievement Kick Him Up!
+dim achBB as ubyte = 0 ' Achievement Burn Baby!
+dim achHS as ubyte = 6 ' Achievement Head Shot!
+dim achHH as ubyte = 0 ' Achievement Head Hunter!
+dim achRNR as ubyte = 0 ' Achievement Rock n Roll
+dim achSD as ubyte = 0 ' Achievement Save Daisy!
+dim achTL as ubyte = 0 'Take the loot
+
+
+
+dim vector(3340) as ubyte => {32,11,111,30,0,222,30,0,222,6,0,7,1,106,4,1,12,0,222,100,103,2,0,103,8,0,106,3,0,111,12,0,222,100,102,2,0,102,8,0,106,3,0,111,12,0,222,100,109,2,0,109,8,0,106,100,118,100,111,12,0,222,13,0,106,100,119,100,111,12,0,222,6,0,3,1,106,7,1,111,3,0,7,1,106,101,222,9,0,106,18,0,106,100,222,9,0,106,16,0,107,100,106,100,111,10,11,106,5,0,13,1,106,101,222,100,2,21,5,0,111,106,5,0,111,12,0,106,100,222,7,0,118,111,106,5,0,111,6,0,103,3,0,103,100,106,100,222,100,122,123,4,0,119,111,6,1,2,11,5,0,102,3,0,102,100,106,100,111,10,11,7,0,111,5,0,109,3,0,109,100,106,100,222,16,0,111,11,0,106,100,222,2,0,3,4,19,0,118,3,0,106,100,222,100,5,4,100,2,4,9,0,2,8,4,0,119,3,0,106,100,222,31,1,32,77,255,111,14,0,2,11,14,0,222,100,103,2,0,108,9,0,2,11,9,0,110,2,0,103,100,222,100,102,100,106,8,1,106,100,2,11,100,106,8,1,106,100,102,100,222,100,109,100,106,8,0,106,100,2,11,100,106,8,0,106,100,109,100,222,3,0,106,4,0,111,3,0,106,100,2,11,100,106,3,0,111,4,0,106,3,0,222,3,0,106,4,0,111,3,0,106,100,2,11,100,106,3,0,111,4,0,106,100,108,100,222,6,1,106,101,111,3,0,106,4,0,106,3,0,111,101,106,6,1,222,6,0,106,100,111,3,0,106,104,2,0,104,106,3,0,111,100,106,6,0,222,6,0,106,100,111,100,106,3,1,2,0,3,1,106,100,111,100,106,6,0,222,6,0,106,100,111,100,106,8,0,106,100,111,100,106,6,0,222,104,5,0,106,108,111,100,106,8,0,106,100,111,110,106,5,0,104,222,4,1,106,3,1,111,100,106,7,0,118,106,100,111,3,1,106,4,1,222,4,0,106,3,0,111,100,106,100,107,4,0,107,119,106,100,111,3,0,106,4,0,222,4,0,106,3,0,111,100,3,1,106,2,0,106,3,1,100,111,3,0,106,4,0,222,100,110,2,0,106,3,0,111,4,0,106,2,0,106,4,0,111,2,0,108,106,4,0,222,2,1,106,3,1,4,0,103,2,0,106,2,0,106,2,0,103,4,0,3,1,106,2,1,222,2,0,106,2,0,103,4,0,102,2,0,106,2,0,106,2,0,102,4,0,103,2,0,106,2,0,222,2,0,106,2,0,102,4,0,109,2,0,106,2,0,106,2,0,109,4,0,102,2,0,106,2,0,222,2,0,106,2,0,109,6,0,118,106,2,0,106,7,0,109,2,0,106,3,0,111,2,0,106,108,8,0,119,106,2,0,106,9,0,110,106,2,0,199,5,1,8,17,2,1,12,17,5,1,255,32,0,3,11,100,3,11,24,0,111,3,11,100,3,11,24,0,111,3,11,100,3,11,19,0,107,4,0,111,3,11,100,3,11,106,3,1,2,0,106,5,1,106,3,0,106,6,1,106,222,5,0,111,106,5,0,106,5,11,106,3,0,106,6,0,106,222,5,0,111,106,5,0,106,2,11,103,2,11,106,2,4,100,106,6,0,106,222,2,0,104,2,0,111,106,3,0,3,1,103,111,102,111,103,5,1,6,0,106,222,100,2,4,100,104,111,106,6,0,102,111,109,111,102,4,0,111,6,0,106,222,5,4,111,106,6,0,109,111,100,111,109,3,0,110,111,6,0,106,222,5,4,111,106,7,0,111,108,111,2,0,101,106,101,111,6,0,106,222,5,4,111,106,7,0,111,106,111,3,0,106,100,111,6,0,106,222,5,4,111,106,7,0,111,106,111,3,0,106,100,111,6,0,106,222,5,4,111,106,7,0,111,106,111,2,0,2,6,100,111,6,0,106,111,7,11,5,1,106,101,100,111,106,111,2,0,106,2,0,111,6,0,106,222,11,0,106,2,0,111,106,111,2,0,106,2,0,3,1,106,4,1,222,11,0,106,2,0,111,106,111,118,4,6,3,0,106,4,0,222,3,0,4,4,4,0,106,100,110,111,106,111,119,106,2,0,106,3,0,106,3,0,110,222,14,1,111,106,111,2,1,2,17,9,1,111,15,77,111,106,111,14,77,16,77,199,15,77,255,16,11,100,15,11,111,2,0,103,2,0,103,2,0,103,2,0,103,2,0,111,100,111,7,0,118,5,0,222,2,0,102,2,0,102,2,0,102,2,0,102,2,0,111,106,111,7,0,119,3,0,108,100,222,2,0,109,2,0,109,2,0,109,2,0,109,2,0,111,106,111,106,12,1,222,14,0,111,106,111,106,111,11,0,222,100,118,12,0,111,106,111,106,111,100,103,7,0,103,100,222,100,119,100,3,4,7,0,2,11,106,111,106,111,100,102,7,0,102,100,222,9,1,106,2,0,3,11,106,111,106,111,100,109,7,0,109,100,222,8,0,111,106,2,0,3,11,106,111,106,111,11,0,111,2,11,7,0,111,106,5,0,106,111,106,111,11,0,111,100,111,7,0,111,106,5,0,106,111,106,111,11,17,111,100,111,2,0,108,106,4,11,6,1,106,111,106,13,11,100,111,2,0,110,106,111,8,0,111,106,111,106,13,0,2,11,2,0,108,106,111,100,103,4,0,103,100,111,106,111,106,100,110,10,0,222,100,118,100,110,106,111,100,102,4,0,102,100,111,106,111,10,1,106,2,1,222,100,119,100,108,106,111,100,109,4,0,109,100,111,106,111,10,0,106,2,0,111,2,11,4,1,111,8,0,111,106,111,10,0,106,2,0,111,2,11,4,0,111,8,0,111,106,14,0,111,100,111,3,0,2,11,108,110,108,5,0,111,106,4,0,108,110,108,110,108,5,0,111,5,0,2,11,3,1,2,0,3,1,111,15,1,111,5,17,2,11,8,17,111,16,17,255,111,19,0,12,11,111,19,0,2,11,8,0,2,11,111,15,0,103,100,103,100,2,11,9,0,222,15,0,102,100,102,100,111,8,0,118,100,222,9,0,107,5,0,109,100,109,100,111,8,0,119,100,222,10,1,106,2,8,6,0,111,100,2,1,106,6,1,222,2,0,103,2,0,103,2,0,103,100,3,1,106,5,0,111,100,111,100,106,6,0,222,2,0,102,2,0,102,2,0,102,4,0,106,5,0,111,117,111,100,106,6,0,222,118,100,109,2,0,109,2,0,109,4,0,106,5,0,3,11,100,106,3,0,2,4,110,222,119,2,0,2,4,5,0,104,2,0,2,6,4,0,3,11,101,106,6,1,222,3,0,4,4,2,0,2,4,3,0,106,8,0,106,6,0,111,14,11,100,2,6,7,0,106,6,0,222,10,0,111,4,0,106,3,0,106,8,1,2,0,222,8,0,108,100,111,4,0,106,3,0,106,10,0,222,9,1,106,111,100,118,2,0,106,3,0,106,10,0,222,9,0,106,111,100,119,2,0,106,3,0,106,4,0,108,100,2,8,2,0,222,9,0,106,111,2,1,100,5,1,106,3,0,2,1,106,2,1,2,0,222,118,4,0,104,3,0,106,111,8,0,106,5,0,106,4,0,222,119,3,0,3,4,2,0,106,111,8,0,106,5,0,106,4,0,222,10,1,111,2,0,7,6,5,0,106,4,1,111,11,17,111,20,17,255,32,11,111,15,0,111,10,0,118,3,0,222,15,0,111,10,0,119,2,0,108,222,7,0,108,110,108,110,108,110,2,0,2,11,108,10,1,106,101,111,6,11,106,11,11,110,111,9,0,106,100,222,5,0,106,3,0,2,11,3,0,3,11,108,111,100,103,7,0,106,100,222,2,4,3,0,106,3,0,2,11,118,2,0,111,100,111,110,111,100,102,2,0,110,108,110,108,100,106,100,222,2,4,3,0,106,3,0,2,11,119,2,0,111,100,111,108,111,100,109,100,6,1,106,100,222,14,1,111,106,111,110,111,9,0,106,100,222,100,103,12,0,111,106,111,108,111,9,0,106,100,222,100,102,4,0,108,110,108,110,108,110,108,100,111,106,111,100,111,6,0,2,4,100,106,100,222,100,109,2,0,106,8,1,106,111,106,111,106,111,3,1,106,7,1,222,4,0,106,111,7,0,106,111,106,111,106,3,0,111,106,7,0,222,4,0,106,111,7,0,106,111,106,111,106,3,0,111,106,7,0,222,100,118,2,0,106,111,100,106,4,1,100,106,111,106,111,106,4,1,106,101,6,0,222,100,119,2,0,106,111,100,106,100,103,3,0,106,111,106,111,5,0,106,100,103,100,103,3,0,222,5,1,111,100,106,100,102,3,0,106,111,106,111,5,0,106,100,102,100,102,3,0,222,7,0,106,100,109,3,0,106,111,106,6,0,106,100,109,100,109,3,0,222,7,0,106,4,0,104,106,111,106,6,0,106,7,0,222,7,0,106,4,0,104,106,111,106,6,0,106,7,0,111,9,1,4,17,2,1,111,117,7,1,5,17,3,1,255,111,7,0,111,13,0,103,5,0,103,3,0,111,2,0,118,4,0,111,13,0,102,5,0,102,3,0,111,2,0,119,4,0,111,11,0,111,100,109,100,101,106,101,100,109,100,111,100,111,10,1,106,8,0,111,2,0,101,100,106,100,101,2,0,111,100,2,11,5,0,106,2,0,111,106,6,0,106,108,111,4,0,106,100,118,2,0,111,100,100,111,5,0,106,2,0,111,106,108,5,0,106,110,111,2,0,107,100,106,100,119,2,0,111,100,100,111,5,0,106,2,0,111,3,1,106,100,108,100,106,108,111,3,1,100,106,100,3,1,111,100,100,111,5,0,106,2,0,4,11,106,2,1,100,106,110,111,4,0,106,4,0,111,100,100,111,5,0,106,2,0,111,100,103,100,106,3,0,106,100,111,100,104,2,0,106,2,0,2,4,111,100,100,111,104,4,0,106,2,0,111,100,102,100,106,3,0,106,100,5,11,106,6,11,100,111,104,4,0,106,2,0,111,100,109,100,106,101,106,2,1,6,0,106,5,0,111,5,11,106,6,11,4,0,106,8,0,106,5,0,222,2,4,2,0,106,5,0,111,4,0,106,4,0,5,1,106,4,1,222,2,4,2,0,106,5,0,111,4,0,106,9,0,106,4,0,111,10,11,106,111,4,0,106,9,0,106,4,0,222,9,0,106,111,107,3,0,106,9,0,106,4,0,222,9,0,106,3,11,100,4,1,100,106,5,1,106,4,0,222,7,0,118,100,106,111,8,0,106,5,0,106,4,0,222,3,0,104,3,0,119,100,106,111,8,0,106,5,0,106,104,2,8,110,222,10,1,111,2,0,7,6,5,0,106,5,11,111,10,17,111,15,17,5,11,255,30,11,100,222,28,0,111,199,222,12,0,107,13,0,103,100,111,106,222,12,0,5,1,106,8,0,102,100,111,106,222,2,0,106,6,1,106,6,0,111,106,110,108,2,0,111,110,2,0,109,100,111,106,222,2,0,106,111,5,0,106,6,0,111,4,1,106,2,11,106,3,0,111,106,222,2,0,106,111,100,103,3,0,106,2,0,106,2,11,6,0,106,111,100,106,3,0,111,106,222,2,0,106,111,100,102,2,0,111,106,2,0,106,111,7,0,106,111,100,106,3,0,111,106,222,2,0,106,111,100,109,2,0,6,11,7,0,106,111,100,106,3,0,111,106,222,2,0,106,111,17,0,106,111,100,106,3,0,111,106,222,2,0,106,111,8,0,177,2,0,110,108,111,3,0,106,111,100,106,3,0,111,106,222,2,0,106,111,2,0,118,5,0,177,100,4,11,3,0,106,111,100,106,3,0,111,106,222,3,1,111,110,108,119,5,0,177,8,0,106,111,100,106,5,0,111,8,11,5,0,111,8,0,106,111,100,106,100,108,110,108,100,222,12,0,11,11,100,106,105,5,11,111,24,0,106,5,0,222,9,0,106,111,4,0,2,4,7,0,106,5,0,222,9,0,106,2,0,106,4,11,2,0,2,4,3,0,106,5,0,222,9,0,106,2,0,106,3,0,5,11,100,2,4,106,5,0,222,7,0,3,11,100,2,11,7,0,5,11,5,0,111,32,17,255,8,11,23,0,111,6,0,2,11,110,8,0,103,3,0,103,2,0,103,3,0,103,2,0,111,6,0,2,11,7,1,106,100,102,100,106,100,102,2,0,102,100,106,100,102,2,0,111,7,0,111,7,0,106,100,109,108,106,108,109,2,0,109,110,106,110,109,2,0,111,7,0,111,7,0,106,2,0,110,106,110,4,0,108,106,108,3,0,111,7,0,111,7,0,106,2,0,108,106,108,4,0,110,106,110,3,0,111,7,0,111,7,0,106,2,0,110,106,110,4,0,108,106,108,100,118,100,111,7,0,111,7,0,106,2,0,108,106,108,4,0,110,106,110,100,119,100,222,100,2,4,3,0,111,7,0,106,111,2,0,106,6,0,106,100,3,1,222,3,4,2,0,2,11,106,7,1,111,107,100,106,100,107,4,0,106,4,0,111,4,11,100,104,2,11,106,10,0,106,6,0,106,4,0,111,8,11,106,10,0,106,6,0,106,111,110,2,0,222,6,0,10,1,106,100,106,100,106,4,1,106,111,108,2,0,222,100,103,13,0,7,11,3,0,106,2,11,108,100,222,100,102,100,106,111,20,0,106,100,2,11,100,222,100,109,100,106,111,2,1,5,0,3,1,9,0,111,106,4,0,222,3,0,106,111,19,0,2,11,106,3,0,222,3,0,106,111,2,0,3,1,8,0,3,1,4,0,2,11,106,2,0,222,3,0,106,111,23,0,106,118,222,3,0,106,111,9,0,3,4,11,0,106,119,111,6,11,5,17,21,11,255,111,9,0,111,20,0,222,9,0,111,20,0,222,6,1,106,2,0,111,6,0,188,13,0,222,6,0,106,2,0,111,3,0,106,5,1,106,10,0,222,6,0,106,2,0,111,3,0,106,5,0,106,10,0,222,6,0,106,2,0,111,3,0,106,5,0,106,10,0,222,100,13,1,5,0,7,1,106,2,1,100,222,108,4,0,111,20,0,106,2,0,108,222,110,4,0,111,4,0,108,110,108,13,0,106,100,2,10,222,108,4,0,111,2,0,7,1,3,0,8,1,106,2,1,108,222,110,4,0,2,11,19,0,106,3,0,222,3,1,3,0,111,19,0,106,3,0,222,6,0,111,3,0,110,108,110,13,0,106,3,0,222,6,0,111,3,0,5,1,106,12,1,2,0,222,4,0,118,100,111,8,0,106,14,0,222,4,0,119,100,111,3,0,108,110,108,2,0,106,14,0,222,3,0,3,1,2,11,2,0,16,1,106,2,11,117,222,7,0,111,18,0,106,4,11,2,11,6,0,111,18,0,106,2,0,118,111,2,11,6,17,111,18,0,106,2,0,119,111,9,11,3,17,11,11,4,17,5,11}
+
+
+dim termcoord1(9,3,1) as ubyte => {_
+{ _
+{25,17},_
+{16,6},_
+{8,13},_
+{255,255}_
+}, _
+{ _
+{13,18},_
+{19,11},_
+{255,255},_
+{255,255}_
+},_
+{ _
+{18,16},_
+{5,2},_
+{255,255},_
+{255,255}_
+},_
+{ _
+{2,5},_
+{2,14},_
+{25,1},_
+{255,255}_
+},_
+{ _
+{1,17},_
+{1,8},_
+{29,3},_
+{13,14}_
+},_
+{ _
+{2,14},_
+{12,6},_
+{11,6},_
+{27,1}_
+},_
+{ _
+{3,1},_
+{8,17},_
+{27,4},_
+{255,255}_
+},_
+{ _
+{7,11},_
+{255,255},_
+{255,255},_
+{255,255}_
+},_
+{ _
+{30,18},_
+{29,6},_
+{255,255},_
+{255,255}_
+},_
+{ _
+{5,14},_
+{30,18},_
+{255,255},_
+{255,255}_
+}_
+}
+
+dim termscript1(9,3,14) as ubyte => {_
+{ _
+{20,18,08,21,18,08,25,17,20,31,18,99,31,17,0},_
+{16,6,20,8,3,05,-1,-1,-1,-1,-1,-1,-1,-1,-1},_
+{8,14,6,8,13,6,8,12,6,8,11,6,255,255,255},_
+{255,255,255,255,255,255,255,255,255,255,255,255,255,255,255}_
+},_
+{ _
+{15,20,01,16,20,01,17,20,01,18,20,01,13,18,20},_
+{15,8,01,16,8,01,14,7,10,17,7,10,19,11,20},_
+{255,255,255,255,255,255,255,255,255,255,255,255,255,255,255},_
+{255,255,255,255,255,255,255,255,255,255,255,255,255,255,255}_
+},_
+{ _
+{18,16,20,6,2,0,6,3,0,5,2,18,5,3,19},_
+{5,2,20,17,16,0,17,17,0,255,255,255,255,255,255},_
+{255,255,255,255,255,255,255,255,255,255,255,255,255,255,255},_
+{255,255,255,255,255,255,255,255,255,255,255,255,255,255,255}_
+},_
+{ _
+{2,5,20,9,9,0,9,10,0,11,11,0,11,10,8},_
+{2,14,20,15,18,0,15,17,0,28,18,6,28,17,6},_
+{25,1,20,25,10,8,25,11,8,25,3,10,31,13,99},_
+{255,255,255,255,255,255,255,255,255,255,255,255,255,255,255}_
+},_
+{ _
+{1,13,6,1,12,6,1,11,6,1,10,6,1,17,20},_
+{1,9,6,1,8,6,1,7,6,1,6,6,1,5,6},_
+{29,3,20,14,11,05,13,11,05,29,18,10,30,18,10},_
+{13,14,20,31,19,01,31,18,99,31,17,00,30,18,10}_
+},_
+{ _
+{2,14,20,14,10,6,14,9,6,14,8,6,255,255,255},_
+{12,6,20,11,6,18,11,7,19,14,4,5,25,14,1},_
+{11,6,20,10,6,0,10,7,0,15,6,0,15,7,0},_
+{27,1,20,31,18,0,31,19,99,26,14,1,27,14,1}_
+},_
+{ _
+{3,1,20,3,3,0,3,11,5,3,19,0,8,2,0},_
+{8,17,20,8,1,0,7,3,6,3,14,0,3,14,5},_
+{27,4,20,31,11,99,31,10,0,255,255,255,255,255,255},_
+{255,255,255,255,255,255,255,255,255,255,255,255,255,255,255}_
+},_
+{ _
+{7,11,20,7,13,5,30,12,6,30,13,6,255,255,255},_
+{255,255,255,255,255,255,255,255,255,255,255,255,255,255,255},_
+{255,255,255,255,255,255,255,255,255,255,255,255,255,255,255},_
+{255,255,255,255,255,255,255,255,255,255,255,255,255,255,255}_
+},_
+{ _
+{30,18,20,27,18,11,28,18,11,28,19,11,255,255,255},_
+{29,6,20,31,6,0,31,7,99,255,255,255,255,255,255},_
+{255,255,255,255,255,255,255,255,255,255,255,255,255,255,255},_
+{255,255,255,255,255,255,255,255,255,255,255,255,255,255,255}_
+},_
+{ _
+{5,14,20,7,14,0,7,15,0,9,16,11,10,16,11},_
+{30,18,20,10,5,0,10,4,0,0,0,0,0,1,99},_
+{255,255,255,255,255,255,255,255,255,255,255,255,255,255,255},_
+{255,255,255,255,255,255,255,255,255,255,255,255,255,255,255}_
+}_
+}
+
+function CanDraw(x as ubyte, y as ubyte) as ubyte
+	if y>20 or x>31 then return 0
+	return 1
+end function
+
+sub DrawUI1(lives as ubyte, ammo as ubyte, shield as ubyte, frags as ubyte, mapnumber as ubyte, backwardmode as ubyte)
+	dim i as ubyte = 14
+	dim j as ubyte = 22
+	paper 0
+	Achievement()
+	if achFB = 2 then print at j,i; ink 2; "\A": i=i+2
+	if achSFS = 2 then print at j,i; ink 5; "\B": i=i+2
+	if achKHU = 2 then print at j,i; ink 6; "\C": i=i+2
+	if achBB = 2 then print at j,i; ink 2; "\D": i=i+2
+	if achHS = 2 then print at j,i; ink 4; "\F": i=i+2
+	if achHH = 2 then print at j,i; ink 7; "\G": i=i+2
+	if achRNR = 2 then print at j,i; ink 6; "\K": i=i+2
+	
+	
+	print at j,30; ink 4; "\E"
+	
+	Environment()
+	paper 0
+	print at j,0; ink 6; "\G"
+	print at j,3; ink 5; "\H"
+    print at j,6; ink 4; "\J"
+	print at j,9; ink 7; "\T"
+	if achSD = 2 then print at j,12; ink 7; "\I"
+	
+	ink 7
+	printat64(j,2)
+	if lives<10 then 
+		print64("0"+STR(lives))
+	else
+		print64(STR(lives))
+	end if 
+	printat64(j,8)
+	if ammo<10 then 
+		print64("0"+STR(ammo))
+	else
+		print64(STR(ammo))
+	end if 
+	printat64(j,14)
+	if shield<10 then 
+		print64("0"+STR(shield))
+	else
+		print64(STR(shield))
+	end if 
+	printat64(j,20)
+	if frags<10 then 
+		print64("0"+STR(frags))
+	else
+		print64(STR(frags))
+	end if 
+	if frags=25 and achHH = 0 then achHH = 1
+	ink 7
+	dim stage as ubyte
+	stage = mapnumber
+	if backwardmode = 1 and mapnumber <> 10 then stage = 10+(10-mapnumber)
+	printat64(j,62): print64(STR(stage))
+end sub
+
+function CanHit1(x1 as ubyte, y1 as ubyte, x2 as ubyte) as ubyte
+	dim i as ubyte
+	for i=x1 to x2
+		if map(y1,i) = 11 then return 0
+	next i
+	return 1
+end function
+
+dim backwardmode as ubyte = 0
+sub SetBackwardMode(bm as ubyte)
+	backwardmode = bm
+end sub
+
+sub CopyLevels(mapNumber as ubyte, removeItems as ubyte)
+	paper 0
+	cls
+	dim x as ubyte
+	dim y as ubyte
+	dim pos as ubyte
+	x=0
+	y=0
+	dim mapcounter as ubyte = 1
+	dim i as uinteger
+	dim stage as ubyte
+	stage = mapNumber
+	if mapNumber = 10 then backwardmode = 1
+	if backwardmode = 1 and mapNumber <> 10 then stage = 20-mapNumber
+	print at 10,12; ink 4; "STAGE "+str(stage)
+	dim value as ubyte
+	for i=0 to 3340
+		value = vector(i)
+		if value=255 then mapcounter=mapcounter+1: goto skip
+		if mapNumber=mapcounter then
+			if value>99 and value<200 then
+				map(y,x) = value-100
+				x=x+1
+				if x>31 then x = 0: y=y+1
+				goto skip
+			end if
+			if value=222 then
+				map(y,x) = 11
+				x=x+1
+				if y=20 and x=31 then exit for
+				if x>31 then x = 0: y=y+1
+				map(y,x) = 11
+				x=x+1
+				if y=20 and x=31 then exit for
+				if x>31 then x = 0: y=y+1
+				goto skip
+			end if
+			if value<100
+				for pos=1 to value
+					map(y,x) = vector(i+1)
+					if map(y,x) = 0 then
+						if Int(rnd*7) = 5 then map(y,x) = 5
+					end if
+					x=x+1
+					if x>31 then x = 0: y=y+1
+				next
+				i=i+1
+			end if
+			:skip
+			if y=20 and x=31 then exit for
+		end if
+	next
+	dim temp as ubyte
+	for x=0 to 31
+		for y=0 to 20
+			temp=map(y,x)
+			if removeItems=1 and (temp=7 or temp=8 or temp=10) then map(y,x)=0
+			if temp = 5 and map(y,x-1) = 0 then map(y,x-1)=52
+			if temp = 5 and map(y,x+1) = 0 then map(y,x+1)=53
+			if y<20 then
+				if temp = 11 and map(y+1,x) = 0 then 
+					temp=rnd*6
+					if temp=0 then temp=54
+					if temp=1 then temp=55
+					if temp=2 then temp=56
+					if temp>53 then map(y+1,x)=temp
+				end if 
+			end if 
+		next
+	next
+	print at 10,12; ink 4; "GET READY"
+	temp=mapNumber-1
+	for x=0 to 1
+		for y=0 to 3
+			termcoord(y,x) = termcoord1(temp,y,x)
+		next y
+	next x
+	for x=0 to 14
+		for y=0 to 3
+			termscript(y,x) = termscript1(temp,y,x)
+		next y
+	next x
+end sub
+
+sub DrawLevel1(mapNumber as ubyte, removeItems as ubyte)
+	CopyLevels(mapNumber,removeItems)	
+	if backwardmode = 1 then
+		if mapNumber = 1 then
+			map(12,2)=0
+			map(12,3)=0
+			map(13,2)=25
+			map(13,3)=26
+			map(13,4)=27
+			map(13,5)=28			
+			map(14,2)=29
+			map(14,3)=30
+			map(14,4)=31
+			map(14,5)=32
+		end if 
+		if mapNumber = 2 then
+			map(18,31)=11
+			map(19,31)=11
+			map(19,0)=99
+			map(18,0)=0
+		end if 
+		if mapNumber = 4 then
+			map(12,31)=11
+		end if 
+		if mapNumber = 5 then
+			map(15,26)=6
+			map(14,26)=6
+			map(13,26)=6
+			map(12,26)=6
+			map(11,26)=6
+			map(10,26)=6
+			map(9,26)=6
+			map(12,12)=5
+		end if 
+		if mapNumber = 7 then
+			map(17,12)=0
+			map(17,13)=0
+			map(16,19)=1
+		end if 
+		if mapNumber = 8 then
+			map(1,30)=0
+			map(4,23)=5
+		end if 
+		if mapNumber = 9 then 
+			map(7,7)=0
+		end if 
+	end if 			
+	
+	dim x1 as ubyte
+	dim y1 as ubyte
+	for x1=0 to 31
+		for y1=0 to 20
+			RedrawArea1(x1,y1)
+		next
+	next
+
+	dim los1 as ubyte
+	dim los2 as ubyte
+	dim x2 as ubyte
+	dim y2 as ubyte
+	los1=0
+	los2=0
+
+	if mapNumber=1 then
+		x1=22
+		y1=2		
+		x2=22
+		y2=3
+		los1=1
+		los2=1
+		sprite1="\A\B\C\D\E\F\G"
+		sprite2="\H\I\J\K\L\M\N"
+	end if 
+
+	if mapNumber=3 then
+		x1=12
+		y1=0		
+		los1=1
+		sprite1="\A\B\C\D\E\F\G\H\I\J"
+	end if 
+
+	if mapNumber=5 or mapNumber=7 then	
+		sprite1="\A\B\C\D\E\F\G\H\I\J\K"
+	end if 
+
+	if mapNumber=5 then
+		x1=2
+		y1=0		
+		x2=2
+		y2=1
+		los1=1
+		los2=1
+	end if 
+
+	if mapNumber=7 then
+		x1=10
+		y1=0		
+		los1=1
+	end if 
+
+	if mapNumber=10 then
+		x1=17
+		y1=0		
+		los1=1
+		sprite1="\A\B\C\D\E\F\G\H\I"
+	end if 
+
+	if los1=1 then
+		if mapNumber=1 then
+			Losung4()
+		end if 
+		if mapNumber=3 then
+			Losung3()
+		end if 
+		if mapNumber=5 then
+			Losung()
+		end if 
+		if mapNumber=7 then
+			Losung5()
+		end if 
+		if mapNumber=10 then
+			Losung6()
+		end if
+		bright 1
+		print at y1,x1; paper 2; ink 7; sprite1
+		bright 0
+	end if 
+
+	if los2=1 then
+		bright 1
+		if mapNumber=1 then
+			Losung4()
+			print at y2,x2; paper 2; ink 7; sprite2
+		end if 
+		if mapNumber=5 then
+			Losung2()
+			print at y2,x2; paper 2; ink 7; sprite1
+		end if 
+		bright 0
+	end if 
+end sub
+
+sub RedrawArea1(x as ubyte, y as ubyte)
+	if CanDraw(x,y)=0 then return
+	dim paperv as ubyte
+	paper 0
+	paperv=0
+	dim inkv as ubyte
+	Environment()
+    dim currentChar as ubyte = map(y,x)
+	if currentChar = 1 then
+		inkv=4: sprite1="\C" ' Floor
+	end if
+	if currentChar = 3 then
+		inkv=6: paperv=2: sprite1=" " ' Vimpel1
+	end if
+	if currentChar=2 then 
+		inkv=6: paperv=2: sprite1="\A" ' Vimpel2
+	end if 
+	if currentChar=9 then
+		inkv=2: paperv=0: sprite1="\B" ' Vimpel3
+	end if 
+	if currentChar = 4 then
+		inkv=6: sprite1="\D" ' Barrel
+	end if
+	if currentChar = 5 then
+		inkv=1: sprite1="\E" ' Wall brick
+	end if
+	if currentChar = 6 then
+		inkv=5: sprite1="\F" ' Stairs
+	end if
+    if currentChar=7 then
+        inkv=6: sprite1="\G" ' Life
+    end if
+    if currentChar=8 then
+        inkv=5: sprite1="\H" ' Ammo
+    end if
+	if currentChar=10 then
+        inkv=4: sprite1="\J" ' Shield
+    end if
+	if currentChar=11 then
+        inkv=1: sprite1="\K" ' Flat
+    end if
+	if currentChar=12 then
+		inkv=2: sprite1="\L" ' DeadRight1
+	end if
+	if currentChar=13 then
+		inkv=2: sprite1="\M" ' DeadRight2
+	end if
+	if currentChar=14 then
+		inkv=2: sprite1="\N" ' DeadLeft1
+	end if
+	if currentChar=15 then
+		inkv=2: sprite1="\O" ' DeadLeft2
+	end if
+	if currentChar=17 then
+		paperv=2: inkv=6: sprite1="\Q" ' Lava
+	end if
+	if currentChar=18 then
+		paperv=5: inkv=7: sprite1="\R" ' Terminal
+	end if
+	if currentChar=19 then
+		inkv=7: sprite1="\S" ' Terminal2
+	end if
+	if currentChar=20 then
+		paperv=0: inkv=7: sprite1="\R" ' Inactive Terminal
+	end if
+	if currentChar=21 then
+		inkv=5: sprite1="\P" ' Lamp
+	end if
+	if currentChar=88 then
+		inkv=7: sprite1="\I" ' Scull
+	end if
+	if currentChar = 0 or currentChar = 99 or currentChar = 77 then
+		sprite1=" "
+	end if
+	if currentChar > 51 and currentChar<58 then
+		Environment3()
+		if currentChar = 52 then inkv=1: sprite1="\A"
+		if currentChar = 53 then inkv=1: sprite1="\B"
+		if currentChar = 54 then inkv=4: sprite1="\C"
+		if currentChar = 55 then inkv=4: sprite1="\D"
+		if currentChar = 56 then inkv=4: sprite1="\E"
+	end if
+	if currentChar > 21 and currentChar < 33 then
+		Environment2()
+		if currentChar = 22 then inkv=5: sprite1="\A" ' Table1
+		if currentChar = 23 then inkv=5: sprite1="\B" ' Table2
+		if currentChar = 24 then inkv=2: sprite1="\C" ' Blood
+		if currentChar = 25 then DrawCar(x,y,1)
+		if currentChar = 26 then DrawCar(x,y,2)
+		if currentChar = 27 then DrawCar(x,y,3)
+		if currentChar = 28 then DrawCar(x,y,4)
+		if currentChar = 29 then DrawCar(x,y,5)
+		if currentChar = 30 then DrawCar(x,y,6)
+		if currentChar = 31 then DrawCar(x,y,7)
+		if currentChar = 32 then DrawCar(x,y,8)	
+		if currentChar>24 then return	
+	end if 
+		
+	print at y,x; ink inkv; paper paperv; sprite1
+end sub
+
+function OnLava(x as ubyte,y as ubyte) as ubyte
+	if map(y+2,x)=17 then return 1
+	if map(y+1,x)=17 then return 2
+	return 0
+end function
+
+function CanFall(x as ubyte,y as ubyte, alive as ubyte) as ubyte
+	dim value as ubyte
+	value = map(y+2,x)
+	if alive = 1 then
+		if value=0 or (value>1 and value<6) or (value>6 and value<11) or (value>17 and value<21) or (value>11 and value<16) or (value>51 and value<58) or value=24 then
+			return 1
+		else
+			return 0
+		end if
+	else
+		if value=0 or (value>1 and value<11) or (value>17 and value<21) or (value>11 and value<16) or value=24 or (value>51 and value<58) then
+			return 1
+		else
+			return 0
+		end if
+	end if
+end function
+
+function CheckMovement1(value as ubyte) as ubyte
+	if value=0 or (value>1 and value<11) or (value>11 and value<16) or value=99 or value=88 or (value>17 and value<33) or value=97 or (value>51 and value<58) then
+		return 1
+	end if 
+	return 0
+end function
+function CheckMovement2(value as ubyte) as ubyte
+	if value=0 or (value>1 and value<11) or (value>11 and value<16) or value=99 or (value>17 and value<33) or (value>51 and value<58) then
+		return 1
+	end if 
+	return 0
+end function
+
+function CanMoveLeft(x as ubyte,y as ubyte) as ubyte
+	if x=0 then return 0
+	dim res as ubyte = 0
+	dim value as ubyte
+	value = map(y+1,x-1)
+	res=CheckMovement1(value)
+	value = map(y,x-1)
+	if res = 1 then
+		res=CheckMovement2(value)
+	end if
+	return res
+end function
+
+function CanMoveRight(x as ubyte,y as ubyte) as ubyte
+	if x+1>31 then return 0
+	dim res as ubyte 
+	res = 0
+	dim value as ubyte
+	value = map(y+1,x+1)
+	res=CheckMovement1(value)
+	value = map(y,x+1)
+	if res = 1 then
+		res=CheckMovement2(value)
+	end if
+	return res
+end function
+
+function NPCCanMoveLeft1(x as ubyte,y as ubyte) as ubyte
+	if x=0 then return 0
+	dim value as ubyte
+	value = map(y+1,x-1)
+	dim value2 as ubyte
+	value2 = map(y+2,x-1)
+	if value=11 or value=99 then return 0
+	if value2=1 or value2=6 or value2=11 then
+		if value=0 or (value>1 and value<11) or value=19 then
+			return 1
+		else
+			return 0
+		end if
+	else
+		return 0
+	end if
+end function
+
+function NPCCanMoveRight1(x as ubyte,y as ubyte) as ubyte
+	if x+1>31 then return 0
+	dim value as ubyte
+	value = map(y+1,x+1)
+	dim value2 as ubyte
+	value2 = map(y+2,x+1)
+	if value=11 or value=99 then return 0
+	if value2=1 or value2=6 or value2=11 then
+		if value=0 or (value>1 and value<11) or value=19 then
+			return 1
+		else
+			return 0
+		end if
+	else
+		return 0
+	end if
+end function
+
+function CanMoveUpDown(x as ubyte,y as ubyte) as ubyte
+	if map(y,x)=6 then
+		return 1
+	else
+		return 0
+	end if
+end function
+
+function PlayerTookItem1(x as ubyte,y as ubyte) as ubyte
+	dim value as ubyte
+	value = map(y,x)
+	if value=7 then map(y,x)=0: return 1
+	if value=8 then map(y,x)=0: return 2
+	if value=10 then map(y,x)=0: return 4
+	if value=88 then map(y,x)=0: return 5
+	if value=99 then return 99
+	if value=97 then return 97
+    return 0
+end function
+
+sub RecoverEnvironment(x as ubyte, y as ubyte, value as ubyte)
+	if map(y-1,x) = value then
+		map(y,x)=value
+	end if
+	if map(y-1,x-1) = value then
+		map(y,x-1)=value
+	end if
+	if map(y-1,x+1) = value then
+		map(y,x+1)=value
+	end if
+	
+	dim temp as ubyte
+	temp = map(y-1,x)
+	if temp = 18 or temp = 20 then
+		map(y,x)=19
+	end if
+	temp = map(y-1,x-1)
+	if temp = 18 or temp = 20 then
+		map(y,x-1)=19
+	end if
+	temp = map(y-1,x+1)
+	if temp = 18 or temp = 20 then
+		map(y,x+1)=19
+	end if
+end sub 
+
+function PlayerSearch1(x as ubyte, y as ubyte, lshield as ubyte, lammo as ubyte, llife as ubyte) as ubyte
+	if x=0 then return 0
+	if x=31 then return 0
+	dim value as ubyte
+	value = map(y,x)
+	if value>11 and value<16 then
+		ShowTakeMenu(lshield, lammo, llife)
+		map(y,x)=0
+		if map(y,x-1)>11 and map(y,x-1)<16 then map(y,x-1)=0
+		if map(y,x+1)>11 and map(y,x+1)<16 then map(y,x+1)=0
+		'Environment()
+		RecoverEnvironment(x,y,6)
+		RecoverEnvironment(x,y,4)		
+		return 1
+	end if
+end function
+
+sub DrawCar(x as ubyte, y as ubyte, v as ubyte)
+	if CanDraw(x,y)=1 then 
+		if v=1 then sprite1="\H"
+		if v=2 then sprite1="\I"
+		if v=3 then sprite1="\J"
+		if v=4 then sprite1="\K"
+		if v=5 then sprite1="\L"
+		if v=6 then sprite1="\M"
+		if v=7 then sprite1="\N"
+		if v=8 then sprite1="\O"
+		print at y,x; ink 4; sprite1
+	end if 
+end sub
+
+function FASTCALL GetKeyScanCode AS UInteger
+    asm
+		PROC
+		LOCAL END_KEY
+		LOCAL LOOP
+
+		ld l, 1
+		ld a, l
+	LOOP:
+		cpl
+		ld h, a
+        in a, (0FEh)
+        cpl
+		and 1Fh
+		jr nz, END_KEY
+
+		ld a, l
+		rla
+		ld l, a
+		jr nc, LOOP
+		ld h, a
+	END_KEY:
+		ld l, a
+		ENDP
+    end asm
+end function
+
+sub ShowTakeMenu(shield as ubyte, ammo as ubyte, lives as ubyte)
+	achTL = 1
+	bright 1
+	if lives>0 then
+		ink 6
+		printat64(21,2): print64("+"+STR(lives))		
+	end if
+	if ammo>0 then
+		ink 5
+		printat64(21,8): print64("+"+STR(ammo))
+	end if
+	if shield>0 then
+		ink 4
+		printat64(21,14): print64("+"+STR(shield))
+	end if
+	bright 0
+	Click()
+end sub
+
+dim winammo as ubyte 
+dim ammotype as ubyte
+
+function TerminalActivated(x as ubyte,y as ubyte) as ubyte
+	if map(y,x) <> 18 then return 0
+	Environment()
+	dim i as ubyte
+	dim j as ubyte
+	paper 0
+	ink 6	
+	winammo=6	
+	ammotype=rnd*2
+	sprite2="\K"
+	for i=9 to 22		
+		print at 7,i; sprite2
+		for j=8 to 15
+			if i=9 or i=22 then
+				sprite1="\K"
+			else
+				sprite1=" "
+			end if
+			print at j,i; sprite1
+		next j
+		print at 15,i; sprite2
+		if i>12 and i<19 then 
+			if ammotype=1 then 
+				print at 13,i; ink 5; "\H"
+			else
+				print at 13,i; ink 4; "\J"
+			end if 
+		end if 
+		beep .002,i
+	next i
+
+	Achievement()
+	dim cursorX as ubyte
+	cursorX = 0
+	dim cursorY as ubyte
+	cursorY = 0
+	border 0
+	ink 7
+
+	dim items(8) as ubyte
+	dim items2(8) as ubyte
+	Shock()
+	
+	:generatecode
+	dim blocks as ubyte
+	blocks = 0
+	dim scull as ubyte
+	scull = 0
+	dim blocks2 as ubyte
+	blocks2 = 0
+	dim scull2 as ubyte
+	scull2 = 0
+	dim newitem as ubyte
+	for i=0 to 8
+		:initpuzzleitem
+		newitem = RND*3
+		if blocks = 3 and newitem = 0 then goto initpuzzleitem
+		if scull = 1 and newitem = 2 then goto initpuzzleitem
+		if newitem = 0 then blocks = blocks + 1
+		if newitem = 2 then scull = scull + 1
+		items(i) = newitem
+		:initpuzzleitem2
+		newitem = RND*3
+		if blocks2 = 3 and newitem = 0 then goto initpuzzleitem2
+		if scull2 = 1 and newitem = 2 then goto initpuzzleitem2
+		if newitem = 0 then blocks2 = blocks2 + 1
+		if newitem = 2 then scull2 = scull2 + 1
+		items2(i) = newitem
+	next
+	if blocks <> 3 or scull <> 1 or blocks2 <> 3 or scull2 <> 1 then goto generatecode
+	dim puzzle(2,2) as ubyte
+	dim puzzle2(2,2) as ubyte
+	dim k as ubyte
+	dim value as ubyte
+	k=0
+	for i=0 to 2
+		for j=0 to 2
+			puzzle(i,j)=items(k)
+			value=items(k)
+			'if value=0 then print at 9+i,11+j; "\H"
+			'if value=1 then print at 9+i,11+j; "\I"
+			'if value=2 then print at 9+i,11+j; "\L"
+			DrawPuzzleItem(j-7,i,value)
+			puzzle2(i,j)=items2(k)
+			value=items2(k)
+			'if value=0 then print at 9+i,18+j; "\H"
+			'if value=1 then print at 9+i,18+j; "\I"
+			'if value=2 then print at 9+i,18+j; "\L"
+			DrawPuzzleItem(j,i,value)
+			k=k+1
+		next
+	next
+
+	dim itemselected as ubyte = 0
+	dim f as ubyte
+	dim d as ubyte
+	:terminalmenu
+	if MultiKeys(keyFire)>0 then
+		if itemselected = 1 then
+			paper 0
+			flash 0
+			ink 7
+			itemselected = 0
+		else
+			paper 2
+			ink 0
+			flash 1
+			itemselected = 1
+		end if
+		DrawPuzzleItem(cursorX,cursorY,puzzle2(cursorY,cursorX))
+		Click()
+		pause 2
+		goto terminalmenu
+	end if
+	if itemselected = 0 then
+		i=cursorX
+		j=cursorY
+		if MultiKeys(keyLeft)>0 then 
+			if cursorX > 0 then cursorX = cursorX - 1
+			goto moveselection
+		end if 
+		if MultiKeys(keyRight)>0 then 
+			if cursorX < 2 then cursorX = cursorX + 1
+			goto moveselection
+		end if 
+		if MultiKeys(keyUp)>0 then 
+			if cursorY > 0 then cursorY = cursorY - 1
+			goto moveselection
+		end if 
+		if MultiKeys(keyDown)>0 then 
+			if cursorY < 2 then cursorY = cursorY + 1
+			goto moveselection
+		end if 
+		goto skipselection
+		:moveselection
+		paper 0
+		flash 0
+		ink 7
+		DrawPuzzleItem(i,j,puzzle2(j,i))		
+		Click()
+		paper 4
+		ink 0
+		flash 1
+		DrawPuzzleItem(cursorX,cursorY,puzzle2(cursorY,cursorX))
+		pause 2
+		:skipselection
+	else
+		paper 0
+		flash 0
+		ink 7
+		d = 0
+		f = puzzle2(cursorY,cursorX)
+		if MultiKeys(keyLeft)>0 and cursorX > 0 then
+			puzzle2(cursorY,cursorX) = puzzle2(cursorY,cursorX-1)
+			puzzle2(cursorY,cursorX-1) = f
+			DrawPuzzleItem(cursorX-1,cursorY,puzzle2(cursorY,cursorX-1))
+			DrawPuzzleItem(cursorX,cursorY,puzzle2(cursorY,cursorX))
+			cursorX = cursorX - 1
+			d=1
+			RemoveWinAmmo(winammo)
+			if winammo>0 then winammo=winammo-1
+		end if
+		if MultiKeys(keyRight)>0 and cursorX < 2 then
+			puzzle2(cursorY,cursorX) = puzzle2(cursorY,cursorX+1)
+			puzzle2(cursorY,cursorX+1) = f
+			DrawPuzzleItem(cursorX+1,cursorY,puzzle2(cursorY,cursorX+1))
+			DrawPuzzleItem(cursorX,cursorY,puzzle2(cursorY,cursorX))
+			cursorX = cursorX + 1
+			d=1
+			RemoveWinAmmo(winammo)
+			if winammo>0 then winammo=winammo-1
+		end if
+		if MultiKeys(keyUp)>0 and cursorY > 0 then
+			puzzle2(cursorY,cursorX) = puzzle2(cursorY-1,cursorX)
+			puzzle2(cursorY-1,cursorX) = f
+			DrawPuzzleItem(cursorX,cursorY-1,puzzle2(cursorY-1,cursorX))
+			DrawPuzzleItem(cursorX,cursorY,puzzle2(cursorY,cursorX))
+			cursorY = cursorY - 1
+			d=1
+			RemoveWinAmmo(winammo)
+			if winammo>0 then winammo=winammo-1
+		end if
+		if MultiKeys(keyDown)>0 and cursorY < 2 then
+			puzzle2(cursorY,cursorX) = puzzle2(cursorY+1,cursorX)
+			puzzle2(cursorY+1,cursorX) = f
+			DrawPuzzleItem(cursorX,cursorY+1,puzzle2(cursorY+1,cursorX))
+			DrawPuzzleItem(cursorX,cursorY,puzzle2(cursorY,cursorX))
+			cursorY = cursorY + 1
+			d=1
+			RemoveWinAmmo(winammo)
+			if winammo>0 then winammo=winammo-1
+		end if
+		if d = 1 then
+			Click()
+			pause 2
+			itemselected = 0
+		end if 
+	end if
+	dim hacked as ubyte
+	hacked = 1
+	for i=0 to 2
+		for j=0 to 2
+			if puzzle(i,j) <> puzzle2(i,j) then
+				hacked=0
+			end if
+		next
+	next
+	if hacked = 1 then
+		ink 4
+		for i=0 to 2
+			for j=0 to 2
+				DrawPuzzleItem(j,i,puzzle2(i,j))
+			next
+		next
+		Click(): Click(): Click()
+		goto terminalhacked
+	end if
+	goto terminalmenu
+	
+	terminalhacked:
+	flash 0
+	for i=9 to 22
+		for j=7 to 15
+			RedrawArea1(i,j)
+		next j
+	next i
+	for i=0 to 3
+		if termcoord(i,0)=x and termcoord(i,1)=y then
+			for j=0 to 14 step 3
+				dim x1 as ubyte = termscript(i,j)
+				dim y1 as ubyte = termscript(i,j+1)
+				dim item as ubyte = termscript(i,j+2)
+				if x1 >= 0 and y1 >= 0 and item <> 255 then
+					map(y1,x1) = item
+					if item <> 20 then RedrawArea1(x1,y1)
+					beep .002,x1
+				end if
+			next j
+			return 1
+		end if
+	next i
+	return 0
+end function
+
+function GetWinAmmo() as ubyte
+	return winammo
+end function
+function GetWinAmmoType() as ubyte
+	return ammotype
+end function
+
+sub RemoveWinAmmo(amount as ubyte)
+	print at 13,12+amount; " "
+end sub
+
+sub DrawPuzzleItem(x as ubyte, y as ubyte, item as ubyte)
+	if item=0 then sprite1="\H"
+	if item=1 then sprite1="\I"
+	if item=2 then sprite1="\L"
+	print at 9+y,18+x; sprite1
+end sub
+
+sub Click()
+	dim v as ubyte
+	for v = 1 to 7
+		beep 0.005,v
+	next v
+end sub
+
+REM sub Click2()
+	REM dim v as ubyte
+	REM for v = 1 to 3
+		REM beep 0.005,v
+	REM next v
+REM end sub
+
+sub Shock()
+	dim v as ubyte
+	for v = 50 to 40 step -1
+		beep 0.005,v
+	next v
+end sub

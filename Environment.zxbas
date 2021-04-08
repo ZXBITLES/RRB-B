@@ -1,0 +1,99 @@
+﻿SUB Environment()
+    POKE UINTEGER 23675, @enviroment
+    RETURN
+    enviroment:
+    ASM
+    DEFB 0,52,98,82,10,36,90,0 				; A hammerAndSickle
+    DEFB 255,255,255,255,255,231,195,129 	; B vimpelBottom
+    DEFB 111,244,202,21,80,0,0,0 			; C floor
+    DEFB 0,124,222,92,92,92,222,124 	 	; D barrel
+    DEFB 62,0,227,0,62,0,199,0 				; E brick
+    DEFB 129,255,129,129,129,255,129,129 	; F stairs
+    DEFB 036,195,066,195,102,189,024,036 	; G life
+    DEFB 24,60,36,44,44,44,24,60 		 	; H ammo
+    DEFB 24,48,96,184,253,222,55,110 	 	; I scull' daisy
+    DEFB 255,143,143,143,78,78,044,024 		; J shield
+    DEFB 126,126,126,0,231,231,231,0 		; K big brick
+    DEFB 0,0,0,0,120,183,239,223 			; L - Dead Right Part1 12
+    DEFB 0,0,0,0,0,001,231,255 				; M - Dead Right Part2 34
+    DEFB 0,0,0,0,0,128,231,255 				; N - Dead Left Part1 12
+    DEFB 0,0,0,0,30,237,247,251 			; O - Dead Left Part2 34
+	DEFB 16,124,254,0,0,0,0,0 				; P lamp
+	DEFB 220,115,72,166,16,66,8,33 			; Q lava
+	DEFB 255,129,161,129,129,129,129,255 	; R terminal
+	DEFB 0,171,0,171,0,0,0,0			 	; S terminal
+	DEFB 24,36,60,153,195,60,195,129	 	; T frag
+    END ASM
+END SUB
+
+SUB Environment2()
+    POKE UINTEGER 23675, @enviroment2
+    RETURN
+    enviroment2:
+    ASM
+    DEFB 255,146,255,60,24,24,24,126 	; A - Table
+	DEFB 255,73,255,0,40,124,68,124		; B
+	DEFB 33,12,94,26,9,41,32,4			; C - Blood
+	
+	DEFB 7,1,12,30,60,120,252,238		; D - Logo
+	DEFB 128,224,112,56,28,28,14,14
+
+	DEFB 71,3,17,56,126,239,195,0
+	DEFB 14,156,220,248,112,248,216,0
+	
+	DEFB 0,0,0,0,0,0,0,15				; H - Car
+	DEFB 0,0,0,0,0,0,3,30
+	DEFB 0,0,1,15,1,0,249,15
+	DEFB 2,34,242,250,242,194,226,252
+
+	DEFB 3,15,49,110,238,238,49,14
+	DEFB 125,197,253,133,253,134,255,0
+	DEFB 247,246,229,245,245,14,255,0
+	DEFB 30,238,246,246,246,236,16,224
+	
+	DEFB 0,0,4,3,21,23,8,7				; P - Bug Logo
+	DEFB 0,0,32,192,168,232,16,224
+
+	DEFB 31,39,7,11,9,4,0,0
+	DEFB 248,228,224,208,144,32,0,0
+	
+	DEFB 0,0,0,234,42,68,138,234		; T - ZX
+
+    END ASM
+END SUB
+
+SUB Environment3()
+    POKE UINTEGER 23675, @enviroment3
+    RETURN
+    enviroment3:
+    ASM
+    DEFB 0,0,1,0,6,0,1,0				; A - brick 2
+	DEFB 0,0,192,0,48,0,0,0				; B - brick 3
+	DEFB 221,42,32,0,0,0,0,0			; C - cabels
+	DEFB 186,20,4,0,0,0,0,0				; D - cabels
+	DEFB 186,20,4,0,0,0,0,0				; E - cabels
+    END ASM
+END SUB
+
+sub Achievement()
+	POKE UINTEGER 23675, @achievement
+	return
+    achievement:
+    ASM
+    DEFB 16,16,56,56,124,92,108,56 			; first blood
+	DEFB 6,12,24,48,12,24,48,96				; strike from the sky
+	DEFB 20,32,92,60,24,8,2,6				; kick him up
+	DEFB 34,56,184,49,108,122,110,182		; burn baby
+	DEFB 0,36,126,36,36,126,36,0			; stage
+	DEFB 195,129,56,52,28,12,133,195		; head shot
+	DEFB 112,176,224,206,141,7,3,1			; head hunter
+	
+	DEFB 255,129,189,189,189,189,129,255 	; square H
+	DEFB 165,82,102,137,186,69,90,133		; info I
+	DEFB 24,48,96,184,253,222,55,110		; scull J daisy
+	DEFB 32,34,34,190,254,126,62,28			; rock n roll K
+	DEFB 255,203,157,173,245,219,165,255	; L hammerAndSickle
+    END ASM
+end sub 
+
+
